@@ -6,6 +6,8 @@ import {
 } from '@nestjs/common';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { Reflector } from '@nestjs/core';
+import { SKIP_TRANSFORM_KEY } from '../decorators/skip-transform.decorator.js';
 
 /**
  * Interceptor de respuesta exitosa.
@@ -15,8 +17,17 @@ import { map } from 'rxjs/operators';
  */
 @Injectable()
 export class TransformInterceptor implements NestInterceptor {
+  constructor(private readonly reflector: Reflector) {}
+
   intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
+    const skip = this.reflector.getAllAndOverride<boolean>(SKIP_TRANSFORM_KEY, [
+      context.getHandler(),
+      context.getClass(),
+    ]);
     const statusCode = context.switchToHttp().getResponse().statusCode;
+    if (skip) {
+      return next.handle();
+    }
     return next.handle().pipe(
       map((data) => ({
         success: true,

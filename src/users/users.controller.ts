@@ -18,8 +18,7 @@ import {
 import { UsersService } from './users.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
-import { Public } from '../common/decorators/public.decorator.js';
-import { Roles } from '../common/decorators/public.decorator.js';
+import { Public, Roles } from '../common/decorators/public.decorator.js';
 import { UserRole } from './user.entity.js';
 
 @Controller('users')

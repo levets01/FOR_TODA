@@ -12,6 +12,7 @@ import { RegisterDto } from './dto/register.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { Public } from '../common/decorators/public.decorator.js';
 import { CurrentUser } from '../common/decorators/current-user.decorator.js';
+import { SkipTransform } from '../common/decorators/skip-transform.decorator.js';
 
 @Controller('auth')
 @ApiTags('autenticación')
@@ -20,6 +21,7 @@ export class AuthController {
 
   @Post('register')
   @Public()
+  @SkipTransform()
   @ApiOperation({ summary: 'Registrar un nuevo usuario' })
   @ApiBody({
     type: RegisterDto,
@@ -45,6 +47,7 @@ export class AuthController {
 
   @Post('login')
   @Public()
+  @SkipTransform()
   @ApiOperation({ summary: 'Iniciar sesión y obtener JWT' })
   @ApiBody({
     type: LoginDto,
