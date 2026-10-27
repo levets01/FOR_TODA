@@ -1,0 +1,49 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    environment:
+      NODE_ENV: ${NODE_ENV:-development}
+      PORT: 3000
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USERNAME: ${POSTGRES_USER:-fleet}
+      DB_PASSWORD: ${POSTGRES_PASSWORD:-fleetpass}
+      DB_DATABASE: ${POSTGRES_DB:-fleetcore}
+      JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1h}
+      API_KEY: ${API_KEY:-change-me-in-production}
+    ports:
+      - '3000:3000'
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-fleet}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fleetpass}
+      POSTGRES_DB: ${POSTGRES_DB:-fleetcore}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'pg_isready -U ${POSTGRES_USER:-fleet} -d ${POSTGRES_DB:-fleetcore}',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
